@@ -1,2 +1,2 @@
-# For-rent-car
-Project for java class
+# โปรเจกรายวิชา OOP
+โปรเจกนี้สร้างขึ้นมาเพื่อนำส่งอาจารย์ในรายวิชา OOP
