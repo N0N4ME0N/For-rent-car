@@ -1,0 +1,4 @@
+1,Toyota,Camry,Normal
+2,Honda,Civic,Normal
+3,Ford,Mustang,Sport
+4,Chevrolet,Camaro,Sport
