@@ -1,16 +1,27 @@
-
 package For_rent_the_car;
 
 import java.io.*;
 import javax.swing.*;
+import java.awt.Cursor;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class register extends javax.swing.JFrame {
-
 
     public register() {
         initComponents();
         this.setLocationRelativeTo(null);
         this.setTitle("Register ");
+        
+        icon_close.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        icon_close.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                new login().setVisible(true);
+                dispose();
+            }
+        });
     }
 
     @SuppressWarnings("unchecked")

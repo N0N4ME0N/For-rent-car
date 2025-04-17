@@ -1,16 +1,34 @@
 package For_rent_the_car;
 
+import java.awt.Cursor;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.*;
 import javax.swing.*;
 
 public class For_rent extends javax.swing.JFrame {
 
+    private String carType;
+    private String loggedInUserEmail;
 
-    public For_rent() {
+    public For_rent(String carType, String userEmail) {
         initComponents();
+        this.carType = carType;
+        this.loggedInUserEmail = userEmail;
         this.setLocationRelativeTo(null);
-        this.setTitle("Main Page");
+        this.setTitle("For Rent - " + carType);
+        
+        icon_close.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        icon_close.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                new main().setVisible(true);
+                dispose();
+            }
+        });
     }
-
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -30,12 +48,12 @@ public class For_rent extends javax.swing.JFrame {
         txt_min1 = new javax.swing.JLabel();
         txt_start1 = new javax.swing.JLabel();
         txt_min2 = new javax.swing.JLabel();
+        icon_close = new javax.swing.JLabel();
 
         popupMenu1.setLabel("popupMenu1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jComboBox1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox1ActionPerformed(evt);
@@ -87,6 +105,8 @@ public class For_rent extends javax.swing.JFrame {
 
         txt_min2.setText("Minute");
 
+        icon_close.setIcon(new javax.swing.ImageIcon(getClass().getResource("/For_rent_the_car/close-window-24.png"))); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -94,7 +114,9 @@ public class For_rent extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel1)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(icon_close)
+                .addContainerGap())
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addGroup(layout.createSequentialGroup()
@@ -143,7 +165,9 @@ public class For_rent extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(icon_close))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
@@ -232,45 +256,54 @@ public class For_rent extends javax.swing.JFrame {
             return;
         }
         
-        String carSelected = (String) jComboBox1.getSelectedItem();
+        CarItem chosen = (CarItem) jComboBox1.getSelectedItem();
+        if (chosen == null) {
+            JOptionPane.showMessageDialog(this, "Please select a car", "Warning", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        String brand = chosen.getBrand();
+        String model = chosen.getModel();
+        String startTime = String.format("%02d:%02d", startHour, startMin);
+        String endTime   = String.format("%02d:%02d", endHour, endMin);
         
-        String message = "Your car: " + carSelected + "\n" +
-                         "Start time: " + String.format("%02d:%02d", startHour, startMin) + "\n" +
-                         "End time: " + String.format("%02d:%02d", endHour, endMin);
-        JOptionPane.showMessageDialog(this, message, "Booking Confirmed", JOptionPane.INFORMATION_MESSAGE);
+        File bookingFile = new File("src/For_rent_the_car/bookings.txt");
+        try {
+            int nextId = 1;
+            try (BufferedReader r = new BufferedReader(new FileReader(bookingFile))) {
+                while (r.readLine() != null) nextId++;
+            }
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(bookingFile, true))) {
+                String record = nextId + "," +
+                            loggedInUserEmail + "," +
+                            brand + "," +
+                            model + "," +
+                            startTime + "," +
+                            endTime;
+                bw.write(record);
+                bw.newLine();
+            }
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this,
+                "Error saving booking: " + ex.getMessage(),
+                "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        JOptionPane.showMessageDialog(this,"Booking Confirmed:\n Brand: " + brand + "\n" +
+            "Model: " + model + "\n" +
+            "Start: " + startTime + "\n" +
+            "End: " + endTime,
+            "Success", JOptionPane.INFORMATION_MESSAGE);
+
+        main m = new main();
+        m.setLoggedInUserEmail(loggedInUserEmail);
+        m.setVisible(true);
+        dispose();
     }//GEN-LAST:event_bt_forrentActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(For_rent.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(For_rent.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(For_rent.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(For_rent.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new For_rent().setVisible(true);
             }
         });
     }
@@ -278,6 +311,7 @@ public class For_rent extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bt_clear;
     private javax.swing.JButton bt_forrent;
+    private javax.swing.JLabel icon_close;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private java.awt.PopupMenu popupMenu1;

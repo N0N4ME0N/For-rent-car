@@ -1,14 +1,28 @@
 package For_rent_the_car;
 
+import java.awt.Cursor;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.*;
 import javax.swing.JOptionPane;
 
 public class login extends javax.swing.JFrame {
 
+    private String loggedInUserEmail;
+    
     public login() {
         initComponents();
         this.setLocationRelativeTo(null);
         this.setTitle("Login");
+        
+        icon_close.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        icon_close.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                dispose();
+            }
+        });
     }
 
     private boolean checkCredentials(String email, String password) {
@@ -163,17 +177,15 @@ public class login extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void bt_resetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_resetActionPerformed
-        // TODO add your handling code here:
         txt_user.setText("");
         txt_password.setText("");
     }//GEN-LAST:event_bt_resetActionPerformed
 
     private void txt_passwordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_passwordActionPerformed
-        // TODO add your handling code here:
+
     }//GEN-LAST:event_txt_passwordActionPerformed
 
     private void bt_loginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_loginActionPerformed
-        // TODO add your handling code here:
         String email = txt_user.getText().trim();
         String password = txt_password.getText().trim();
         
@@ -184,15 +196,22 @@ public class login extends javax.swing.JFrame {
         
         if (checkCredentials(email, password)) {
             JOptionPane.showMessageDialog(this, "Login success", "Success", JOptionPane.INFORMATION_MESSAGE);
+            loggedInUserEmail = email;
             if (email.equals("admin")){
-                new main_admin().setVisible(true);
+                main_admin adminFrame = new main_admin();
+                adminFrame.setLoggedInUserEmail(email);
+                adminFrame.setVisible(true);
             }else{
-                new main().setVisible(true);
+                main userFrame = new main();
+                userFrame.setLoggedInUserEmail(email);
+                userFrame.setVisible(true);
             }
+            System.out.println("Logged In User Email: " + loggedInUserEmail);
             this.dispose();
         } else {
             JOptionPane.showMessageDialog(this, "Email or password is wrong\n"+email + password, "Error", JOptionPane.ERROR_MESSAGE);
         }
+        
     }//GEN-LAST:event_bt_loginActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -200,9 +219,6 @@ public class login extends javax.swing.JFrame {
         this.dispose();
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
