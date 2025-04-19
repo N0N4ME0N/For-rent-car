@@ -4,30 +4,72 @@ import java.awt.Cursor;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 
 public class For_rent extends javax.swing.JFrame {
 
     private String carType;
     private String loggedInUserEmail;
-
+    
     public For_rent(String carType, String userEmail) {
         initComponents();
         this.carType = carType;
         this.loggedInUserEmail = userEmail;
         this.setLocationRelativeTo(null);
         this.setTitle("For Rent - " + carType);
+        loadCarsByType();
+        //ComboBoxTxt();
         
         icon_close.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
         icon_close.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                new main().setVisible(true);
+                new main(loggedInUserEmail).setVisible(true);
                 dispose();
             }
         });
+           
     }
+    
+    private void loadCarsByType() {
+        String filetxt = "src/For_rent_the_car/cars.txt";
+        File file = new File(filetxt);
+        jComboBox1.removeAllItems();
+        jComboBox1.addItem("Choose please");
+        try (BufferedReader BReader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = BReader.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length == 4 && parts[3].trim().equalsIgnoreCase(carType)) {
+                    String carInfo = parts[1].trim() + " " + parts[2].trim(); // Combine brand and model for display
+                    jComboBox1.addItem(carInfo);
+                }
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(For_rent.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(this, "Error reading cars.txt: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+//    public void ComboBoxTxt(){
+//        String filetxt = "src/For_rent_the_car/cars.txt";
+//        File file = new File(filetxt);
+//        
+//        try {
+//            BufferedReader BReader = new BufferedReader(new FileReader(file));
+//            Object[] lines = BReader.lines().toArray();
+//            
+//            for(int i = 0; i < lines.length; i++){
+//                String line = lines[i].toString();
+//                jComboBox1.addItem(line);
+//            }
+//        } catch (FileNotFoundException ex) {
+//            Logger.getLogger(Test.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//    }
+    
     
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -54,6 +96,10 @@ public class For_rent extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
+        jComboBox1.setEditable(true);
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Choose please" }));
+        jComboBox1.setToolTipText("");
+        jComboBox1.setName(""); // NOI18N
         jComboBox1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox1ActionPerformed(evt);
@@ -204,6 +250,7 @@ public class For_rent extends javax.swing.JFrame {
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
         // TODO add your handling code here:
+        
     }//GEN-LAST:event_jComboBox1ActionPerformed
 
     private void txt_end_hourActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_end_hourActionPerformed
@@ -226,12 +273,12 @@ public class For_rent extends javax.swing.JFrame {
         String startMinStr = txt_start_min.getText().trim();
         String endHourStr = txt_end_hour.getText().trim();
         String endMinStr = txt_end_min.getText().trim();
-        
-        if(startHourStr.isEmpty() || startMinStr.isEmpty() || endHourStr.isEmpty() || endMinStr.isEmpty()){
+
+        if (startHourStr.isEmpty() || startMinStr.isEmpty() || endHourStr.isEmpty() || endMinStr.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Plase enter time", "Warning", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        
+
         int startHour, startMin, endHour, endMin;
         try {
             startHour = Integer.parseInt(startHourStr);
@@ -242,30 +289,42 @@ public class For_rent extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Plase enter number only", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        
-        if(startHour < 0 || startHour > 23 || endHour < 0 || endHour > 23 ||
-           startMin < 0 || startMin > 59 || endMin < 0 || endMin > 59) {
+
+        if (startHour < 0 || startHour > 23 || endHour < 0 || endHour > 23 ||
+            startMin < 0 || startMin > 59 || endMin < 0 || endMin > 59) {
             JOptionPane.showMessageDialog(this, "Your enter time is wrong", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        
+
         int startTotalMin = startHour * 60 + startMin;
         int endTotalMin = endHour * 60 + endMin;
-        if(endTotalMin <= startTotalMin) {
+        if (endTotalMin <= startTotalMin) {
             JOptionPane.showMessageDialog(this, "Plase enter 'End Time' more than 'Start Time'", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        
-        CarItem chosen = (CarItem) jComboBox1.getSelectedItem();
-        if (chosen == null) {
+
+        String selectedCarInfo = (String) jComboBox1.getSelectedItem();
+        if (selectedCarInfo == null || selectedCarInfo.equals("Choose please")) {
             JOptionPane.showMessageDialog(this, "Please select a car", "Warning", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        String brand = chosen.getBrand();
-        String model = chosen.getModel();
+
+        String[] carParts = selectedCarInfo.split(" ");
+        String brand = "";
+        String model = "";
+        if (carParts.length >= 2) {
+            brand = carParts[0];
+            // Reconstruct the model in case it has spaces
+            for (int i = 1; i < carParts.length; i++) {
+                model += carParts[i] + (i < carParts.length - 1 ? " " : "");
+            }
+        } else if (carParts.length == 1) {
+            brand = carParts[0];
+        }
+
         String startTime = String.format("%02d:%02d", startHour, startMin);
         String endTime   = String.format("%02d:%02d", endHour, endMin);
-        
+
         File bookingFile = new File("src/For_rent_the_car/bookings.txt");
         try {
             int nextId = 1;
@@ -274,29 +333,28 @@ public class For_rent extends javax.swing.JFrame {
             }
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(bookingFile, true))) {
                 String record = nextId + "," +
-                            loggedInUserEmail + "," +
-                            brand + "," +
-                            model + "," +
-                            startTime + "," +
-                            endTime;
+                                loggedInUserEmail + "," +
+                                brand + "," +
+                                model + "," +
+                                startTime + "," +
+                                endTime;
                 bw.write(record);
                 bw.newLine();
             }
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(this,
-                "Error saving booking: " + ex.getMessage(),
-                "Error", JOptionPane.ERROR_MESSAGE);
+                    "Error saving booking: " + ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        
-        JOptionPane.showMessageDialog(this,"Booking Confirmed:\n Brand: " + brand + "\n" +
-            "Model: " + model + "\n" +
-            "Start: " + startTime + "\n" +
-            "End: " + endTime,
-            "Success", JOptionPane.INFORMATION_MESSAGE);
 
-        main m = new main();
-        m.setLoggedInUserEmail(loggedInUserEmail);
+        JOptionPane.showMessageDialog(this,"Booking Confirmed:\n Brand: " + brand + "\n" +
+                "Model: " + model + "\n" +
+                "Start: " + startTime + "\n" +
+                "End: " + endTime,
+                "Success", JOptionPane.INFORMATION_MESSAGE);
+
+        main m = new main(loggedInUserEmail);
         m.setVisible(true);
         dispose();
     }//GEN-LAST:event_bt_forrentActionPerformed

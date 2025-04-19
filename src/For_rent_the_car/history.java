@@ -14,11 +14,7 @@ public class history extends javax.swing.JFrame {
         this.setTitle("History");
         this.loggedInUserEmail = email;
         loadBookingHistory();
-    }
-    
-    public void setLoggedInUserEmail(String email) {
-        this.loggedInUserEmail = email;
-        loadBookingHistory();
+        System.out.println("Logged In User Email: " + loggedInUserEmail);
     }
     
     private void loadBookingHistory() {
@@ -30,21 +26,20 @@ public class history extends javax.swing.JFrame {
         
         DefaultTableModel model = (DefaultTableModel) table_history.getModel();
         model.setRowCount(0);
+        
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] tokens = line.split(",");
-                if(tokens.length >= 7) {
-                    String bookingID = tokens[0].trim();
+                if(tokens.length >= 6) {
                     String userEmail = tokens[1].trim();
                     String brand = tokens[2].trim();
                     String carName = tokens[3].trim();
                     String startTime = tokens[4].trim();
                     String endTime = tokens[5].trim();
-                    String status = tokens[6].trim();
                     
                     if(loggedInUserEmail.equalsIgnoreCase("admin") || userEmail.equalsIgnoreCase(loggedInUserEmail)) {
-                        Object[] row = {bookingID, userEmail, brand, carName, startTime, endTime, status};
+                        Object[] row = {brand, carName, startTime, endTime};
                         model.addRow(row);
                     }
                 }
@@ -75,13 +70,13 @@ public class history extends javax.swing.JFrame {
 
         table_history.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null}
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
             },
             new String [] {
-                "Brand", "Name car", "Start Time", "End Time", "Status"
+                "Brand", "Name car", "Start Time", "End Time"
             }
         ));
         jScrollPane1.setViewportView(table_history);
@@ -139,12 +134,10 @@ public class history extends javax.swing.JFrame {
 
     private void btn_backActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_backActionPerformed
         if (loggedInUserEmail.equalsIgnoreCase("admin")){
-            main_admin adminFrame = new main_admin();
-            adminFrame.setLoggedInUserEmail(loggedInUserEmail);
+            main_admin adminFrame = new main_admin(loggedInUserEmail);
             adminFrame.setVisible(true);
         }else{
-            main userFrame = new main();
-            userFrame.setLoggedInUserEmail(loggedInUserEmail);
+            main userFrame = new main(loggedInUserEmail);
             userFrame.setVisible(true);
         }
         System.out.println("Logged In User Email: " + loggedInUserEmail);

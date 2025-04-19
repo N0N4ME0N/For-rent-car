@@ -198,15 +198,12 @@ public class login extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Login success", "Success", JOptionPane.INFORMATION_MESSAGE);
             loggedInUserEmail = email;
             if (email.equals("admin")){
-                main_admin adminFrame = new main_admin();
-                adminFrame.setLoggedInUserEmail(email);
+                main_admin adminFrame = new main_admin(loggedInUserEmail);
                 adminFrame.setVisible(true);
             }else{
-                main userFrame = new main();
-                userFrame.setLoggedInUserEmail(email);
+                main userFrame = new main(loggedInUserEmail);
                 userFrame.setVisible(true);
             }
-            System.out.println("Logged In User Email: " + loggedInUserEmail);
             this.dispose();
         } else {
             JOptionPane.showMessageDialog(this, "Email or password is wrong\n"+email + password, "Error", JOptionPane.ERROR_MESSAGE);

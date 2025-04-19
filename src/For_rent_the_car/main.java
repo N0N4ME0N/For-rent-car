@@ -8,15 +8,13 @@ public class main extends javax.swing.JFrame {
 
     private String loggedInUserEmail;
         
-    public main() {
+    public main(String email) {
         initComponents();
         this.setLocationRelativeTo(null);
         this.setTitle("Main Page");
         loadCarData();
-    }
-    
-    public void setLoggedInUserEmail(String email) {
         this.loggedInUserEmail = email;
+        System.out.println("Logged In User Email: " + loggedInUserEmail);
     }
     
     private void loadCarData() {
@@ -207,9 +205,7 @@ public class main extends javax.swing.JFrame {
     }//GEN-LAST:event_bt_submit1ActionPerformed
 
     private void bt_add3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_add3ActionPerformed
-        System.out.println("Logged In User Email: " + loggedInUserEmail);
         history h = new history(loggedInUserEmail);
-        h.setLoggedInUserEmail(loggedInUserEmail);
         h.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_bt_add3ActionPerformed
@@ -221,12 +217,12 @@ public class main extends javax.swing.JFrame {
     }//GEN-LAST:event_bt_submit3ActionPerformed
 
     private void bt_add4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_add4ActionPerformed
-        // TODO add your handling code here:
+        System.out.println("Logged In User Email: " + loggedInUserEmail);
+        history h = new history(loggedInUserEmail);
+        h.setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_bt_add4ActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -269,7 +265,6 @@ public class main extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new main().setVisible(true);
             }
         });
     }
